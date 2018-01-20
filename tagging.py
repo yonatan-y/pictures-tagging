@@ -158,31 +158,4 @@ def make_request(args):
 
 
 
-'''
-if sys.argv[1] == 'faces' :
-    faces_quantity = len(json.loads(r._content)['responses'][0]['faceAnnotations'])
-    faces = []
-    for i in range(faces_quantity) :
-        face = json.loads(r._content)['responses'][0]['faceAnnotations'][i]['boundingPoly']['vertices']
-        for j in range(4) :
-            face[j] = (face[j]['x'] , face[j]['y'])
-        faces.append(face)
-
-    print(faces)
-
-    name, extention = os.path.splitext(sys.argv[3])
-    image_options.draw(sys.argv[3], name + '(after_drawing).jpg', faces)
-
-    image_options.crop(sys.argv[3], name + '(after_cropping).jpg', faces)
-'''
-
-
-
-
-
-#m= make_request(sys.argv)
-
-
-
-
 
