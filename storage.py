@@ -198,24 +198,3 @@ def get_images_by_score(score):
 
 
 #--------------------------------------------------------------------------------------------------#
-
-
-
-
-
-#get_labels_data('6.1.jpg')
-
-#delete_labels_data('1')
-
-'''Count how many documents are in the cluster'''
-#print(es.cat.count())
-
-#delete_all_indices()
-#get_images('burger')
-
-#get_num_of_documents('labels_data')
-
-#get_all_documents('labels_data')
-#check_connection()
-#get_images_by_score('0.9031707')
-#get_images_by_score(0.92)
