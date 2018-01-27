@@ -3,7 +3,7 @@ including all actions e.g. save, delete, search and more.'''
 
 import json
 import logging
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, TransportError
 
 
 
@@ -12,7 +12,6 @@ from elasticsearch import Elasticsearch
 logging.basicConfig(level=logging.ERROR)
 
 es = Elasticsearch()
-#print(es.cluster.health())
 
 
 #--------------------------------------------------------------------------------------------------#
@@ -21,7 +20,12 @@ def store_labels_data(json_package, image):
     '''This function stores labels for a given image.
        If the index does not exist, it will be created first.'''
 
-    es.create(index='labels_data', doc_type='doc', id=image, body=json_package)
+    #If the image already exists in the index, raise exception.
+    try:
+        es.create(index='labels_data', doc_type='doc', id=image, body=json_package)
+        return True
+    except TransportError:
+        return False
 
 
 #--------------------------------------------------------------------------------------------------#
@@ -136,7 +140,7 @@ def get_all_documents(index_name):
 
     query = { 'query' : { 'match_all' : {} } , 'stored_fields' : [] }
 
-    res = es.search(index='labels_data', doc_type='doc', body=query, )
+    res = es.search(index='labels_data', doc_type='doc', body=query, size=100)
 
     if int(res['hits']['total']) == 0:
         print('\nThere are no images in the index', index_name, '.\n')
@@ -187,7 +191,6 @@ def get_images_by_score(score):
         }
 
     res = es.search(index='labels_data', doc_type='doc', body=query)
-    #print(json.dumps(res, indent=4))
     if int(res['hits']['total']) == 0:
         print('\nThere are no images with the score', score, 'or higher.\n')
 
