@@ -133,12 +133,10 @@ def make_request(args):
     #The last cell of the returned list determines whether an actual data received,
     #or not (because of an error).
     if r.status_code != 200:
-        print('\n\n do not save data\n\n\n')
         return [json.dumps(json.loads(r._content), indent=4), args[3], False]
 
     keys = list(json.loads(r._content)['responses'][0].keys())
     if keys.__len__() == 0 or (keys.__len__() > 0 and keys[0] == 'error'):
-        print('\n\n do not save data\n\n\n')
         return [json.dumps(json.loads(r._content), indent=4), args[3], False]
 
 
