@@ -127,22 +127,18 @@ def make_request(args):
 
     # Make a post request and print the response package.
     r = requests.post(url, data=json.dumps(req))
-    #print(r)
-    #print('status code:' ,r.status_code)
     print(json.dumps(json.loads(r._content), indent=4))
-    #print('size:', r._content.__sizeof__())
-
 
 
     #The last cell of the returned list determines whether an actual data received,
     #or not (because of an error).
     if r.status_code != 200:
-        print('\n\n dont save data\n\n\n')
+        print('\n\n do not save data\n\n\n')
         return [json.dumps(json.loads(r._content), indent=4), args[3], False]
 
     keys = list(json.loads(r._content)['responses'][0].keys())
     if keys.__len__() == 0 or (keys.__len__() > 0 and keys[0] == 'error'):
-        print('\n\n dont save data\n\n\n')
+        print('\n\n do not save data\n\n\n')
         return [json.dumps(json.loads(r._content), indent=4), args[3], False]
 
 
