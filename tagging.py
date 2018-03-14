@@ -2,7 +2,6 @@
 
 import json
 import io
-import os
 import sys  # provides access to any command-line arguments.
 import base64  # base64 encoding library.
 import requests  # http library.
@@ -84,10 +83,10 @@ def extract_faces(response):
 
     faces_quantity = len(response['faceAnnotations'])
     faces = []
-    for i in range(faces_quantity) :
+    for i in range(faces_quantity):
         face = response['faceAnnotations'][i]['boundingPoly']['vertices']
-        for j in range(4) :
-            face[j] = (face[j]['x'] , face[j]['y'])
+        for j in range(4):
+            face[j] = (face[j]['x'], face[j]['y'])
         faces.append(face)
 
 
@@ -126,17 +125,26 @@ def make_request(args):
 
 
     # Make a post request and print the response package.
-    r = requests.post(url, data=json.dumps(req))
+    try:
+        r = requests.post(url, data=json.dumps(req))
+
+    except requests.exceptions.RequestException as err:
+        print(err)
+        sys.exit(1)
+
     print(json.dumps(json.loads(r._content), indent=4))
+
 
 
     #The last cell of the returned list determines whether an actual data received,
     #or not (because of an error).
     if r.status_code != 200:
+        print('\n\n do not save data\n\n\n')
         return [json.dumps(json.loads(r._content), indent=4), args[3], False]
 
     keys = list(json.loads(r._content)['responses'][0].keys())
     if keys.__len__() == 0 or (keys.__len__() > 0 and keys[0] == 'error'):
+        print('\n\n do not save data\n\n\n')
         return [json.dumps(json.loads(r._content), indent=4), args[3], False]
 
 
@@ -149,7 +157,3 @@ def make_request(args):
 
 
 #-------------------------------------------------------------------------------------------------#
-
-
-
-
