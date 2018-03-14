@@ -6,23 +6,27 @@ import logging
 from elasticsearch import Elasticsearch, TransportError
 
 
+#The possible indices in storage:
+indices = ['labels', 'landmarks', 'logos', 'web', 'faces', 'text']
 
 #Disable all non-ERROR level messages.
 #This allows to check the connection without logging traceback.
 logging.basicConfig(level=logging.ERROR)
 
-es = Elasticsearch()
+
+es = Elasticsearch() #Represents the elasticsearch client.
+
 
 
 #--------------------------------------------------------------------------------------------------#
 
-def store_labels_data(json_package, image):
-    '''This function stores labels for a given image.
+def store_data(index, json_package, image_id):
+    '''This function stores data in an index for a given image.
        If the index does not exist, it will be created first.'''
 
     #If the image already exists in the index, raise exception.
     try:
-        es.create(index='labels_data', doc_type='doc', id=image, body=json_package)
+        es.create(index=index, doc_type='doc', id=image_id, body=json_package)
         return True
     except TransportError:
         return False
@@ -31,17 +35,17 @@ def store_labels_data(json_package, image):
 #--------------------------------------------------------------------------------------------------#
 
 
-def get_labels_data(image):
-    '''This function gets an image id,
-       and prints the labels of the image, if there are such labels.'''
+def get_data(index, image_id):
+    '''This function gets an image id and index,
+       and prints the data of the image in the index.'''
 
-    if not es.indices.exists(index='labels_data'):
-        print('\nThere is no index for labels.\n')
+    if not es.indices.exists(index=index):
+        print('\nThere is no', index, 'index.\n')
         return
 
-    data = es.get(index='labels_data', doc_type='doc', id=image, ignore=404)
+    data = es.get(index=index, doc_type='doc', id=image_id, ignore=404)
     if data['found'] is False:
-        print('\nThere are no labels for the given image.\n')
+        print('\nThere is no data in', index, 'index for the given image.\n')
     else:
         print(json.dumps((data), indent=4))
 
@@ -50,22 +54,24 @@ def get_labels_data(image):
 
 
 
-def delete_labels_data(image):
-    '''This function gets an image id, and deletes the stored labels of the image,
-       if there are such labels.'''
+def delete_data(index, image_id):
+    '''This function gets an image id, and deletes the stored data of the image
+       in the index.'''
 
-    if not es.indices.exists(index='labels_data'):
-        print('\nThere is no index for labels.\n')
+    if not es.indices.exists(index=index):
+        print('\nThere is no', index, 'index.\n')
         return
 
-    delete = es.delete(index='labels_data', doc_type='doc', id=image, ignore=404)
-    if delete['result'] == 'not_found':
-        print('\nThere are no labels to delete.\n')
-    elif delete['result'] == 'deleted':
-        print('The labels of', image, 'were deleted successfully.\n')
+    delete = es.delete(index=index, doc_type='doc', id=image_id, ignore=404)
 
-    if int(es.count(index='labels_data', doc_type='doc')['count']) == 0:
-        delete_index('labels_data')
+    if delete['result'] == 'not_found':
+        print('\nThere is no data to delete in', index, 'index.\n')
+
+    elif delete['result'] == 'deleted':
+        print('The data of', image_id, 'were deleted successfully.\n')
+
+    if int(es.count(index=index, doc_type='doc')['count']) == 0:
+        delete_index(index)
 
 
 #--------------------------------------------------------------------------------------------------#
@@ -82,71 +88,81 @@ def delete_all_indices():
 
 #--------------------------------------------------------------------------------------------------#
 
-def delete_index(index_name):
+def delete_index(index):
     '''This function deletes specific index from storage
        including all documents in the index.'''
 
-    es.indices.delete(index=index_name, ignore=404)
+    es.indices.delete(index=index, ignore=404)
 
 
 
 #--------------------------------------------------------------------------------------------------#
 
 
-def get_images_by_tag(tag):
-    '''This function gets a tag name, and prints all related images.'''
-
-    if not es.indices.exists(index='labels_data'):
-        print('\nThere is no index for labels_data.\n')
-        return
+def get_images_by_words(words):
+    '''This function gets words, and prints all images that contain
+       data with the words, at least in one index.'''
     
-    query = {'query' : { 'match' : { 'labelAnnotations.description' : tag } }, 'stored_fields' : [] }
+    query = {
+        'query':{
+            'bool':{
+                'should':[
+                    {'match' : { 'labelAnnotations.description' : words} },
+                    {'match' : { 'landmarkAnnotations.description' : words} },
+                    {'match' : { 'logoAnnotations.description' : words} },
+                    {'match' : { 'textAnnotations.description' : words} },
+                    {'match' : { 'webDetection.webEntities.description' : words} }
+                    ]
+                }
+            },
+        'stored_fields' : []
+        }
 
-    res = es.search(index='labels_data', doc_type='doc', body=query)
+    res = es.search(index='*', doc_type='doc', body=query, ignore=404)
 
     if int(res['hits']['total']) == 0:
-        print('\nThere are no images with the tag \'', tag, '\'.')
+        print('\nThere are no images with the word/s \'', words, '\'.')
 
     else:
-        print('\nAll images with the tag \'', tag, '\' :')
+        print('\nAll images with the word/s \'', words, '\' :')
         for i in res['hits']['hits']:
-            print (i['_id'])
-   
+            print(i['_id'])
+
 
 
 #--------------------------------------------------------------------------------------------------#
 
-def get_num_of_documents(index_name):
+def get_num_of_documents(index):
     '''This function prints the munber of images in a specific index.'''
 
-    if not es.indices.exists(index=index_name):
-        print('\nThere is no index for', index_name, '.\n')
+    if not es.indices.exists(index=index):
+        print('\nThere is no', index,'index.\n')
         return
    
-    num = es.count(index=index_name, doc_type='doc')
+    num = es.count(index=index, doc_type='doc')
     num = num['count']
 
-    print('\nNumber of images in', index_name, ':', num, '.\n')
+    print('\nNumber of images in', index, 'index:', num, '.\n')
 
 
 #--------------------------------------------------------------------------------------------------#
 
-def get_all_documents(index_name):
+def get_all_documents(index):
     '''This function prints a list of all images in a specific index.'''
 
-    if not es.indices.exists(index=index_name):
-        print('\nThere is no index for', index_name, '.\n')
+    if not es.indices.exists(index=index):
+        print('\nThere is no', index, 'index.\n')
         return
 
     query = { 'query' : { 'match_all' : {} } , 'stored_fields' : [] }
 
-    res = es.search(index='labels_data', doc_type='doc', body=query, size=100)
+    res = es.search(index=index, doc_type='doc', body=query, size=100)
 
     if int(res['hits']['total']) == 0:
-        print('\nThere are no images in the index', index_name, '.\n')
+        print('\nThere are no images in', index, 'index.\n')
 
     else:
-        print('\nAll images in the index', index_name, ':')
+        print('\nAll images in', index, 'index:')
         for i in res['hits']['hits']:
             print(i['_id'])
 
@@ -163,7 +179,7 @@ def check_connection():
 
 def get_images_by_score(score):
     '''This function gets a score, and prints all images that contains at least
-        one tag with same score or higher score.'''
+        one description with same score or higher score.'''
     
     if not isinstance(score, (float, int)):
         print('Error! input must be float.\n')
@@ -191,13 +207,14 @@ def get_images_by_score(score):
         }
 
     res = es.search(index='labels_data', doc_type='doc', body=query)
+    #print(json.dumps(res, indent=4))
     if int(res['hits']['total']) == 0:
         print('\nThere are no images with the score', score, 'or higher.\n')
 
     else:
         print('\nAll images with the score', score, 'or higher:')
         for i in res['hits']['hits']:
-            print (i['_id'])
+            print(i['_id'])
 
 
 #--------------------------------------------------------------------------------------------------#
