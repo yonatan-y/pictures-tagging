@@ -45,21 +45,25 @@ faces_menu = '''Faces were found in the image.\nWhat operation would you like to
 
 
 get_info_menu = '''\nWhat would you like to get from storage?\n
-                    [1] All tags related to specific image\n
-                    [2] All images related to specific tag\n
+                    [1] All data related to specific image\n
+                    [2] All images related to specific word/s\n
                     [3] Number of all stored images\n
                     [4] List of all stored images\n'''
 
 
 provide_image = 'Please enter full image name\n'
 
-provide_tag = 'Please enter tag name\n'
+provide_tag = 'Please enter word/s\n'
 
 
+#Determine what was the detection type for the last session.
+detections = {
+    'labels':False, 'landmarks':False, 'logos':False,
+    'web':False, 'faces':False, 'text':False
+    }
 
+last_detection = ''
 
-labels = False  #Determine whether labels detection was used for the last session or not.
-faces = False #Determine whether faces detection was used for the last session or not.
 
 command = ['tagging.py']
 
@@ -71,7 +75,7 @@ if not storage.check_connection():
 
 
 
-print('\nPictures Tagging And Storing - Alpha Version')
+print('\nPictures Tagging And Storing - Alpha Version Fix')
 print('---------------------------------------------')
 
 print('\nPress Q at the main menu to quit\n')
@@ -86,29 +90,39 @@ while True:
         user_input = input(tagging_menu)
 
         if user_input == '1':
-            labels = True
+            detections['labels'] = True
             command.append('labels')
+            last_detection = 'labels'
             user_input = input(tagging_menu_2)
 
         elif user_input == '2':
+            detections['landmarks'] = True
             command.append('landmarks')
+            last_detection = 'landmarks'
             user_input = input(tagging_menu_2)
 
         elif user_input == '3':
+            detections['logos'] = True
             command.append('logos')
+            last_detection = 'logos'
             user_input = input(tagging_menu_2)
 
         elif user_input == '4':
+            detections['web'] = True
             command.append('web')
+            last_detection = 'web'
             user_input = input(tagging_menu_2)
 
         elif user_input == '5':
-            faces = True
+            detections['faces'] = True
             command.append('faces')
+            last_detection = 'faces'
             user_input = input(tagging_menu_2)
 
         elif user_input == '6':
+            detections['text'] = True
             command.append('text')
+            last_detection = 'text'
             user_input = input(tagging_menu_2)
 
         else:
@@ -142,13 +156,13 @@ while True:
 
         path, filename = os.path.split(results[1])
 
-        # For now, there is an option to save only labels data.
-        if labels == True and results[2] == True:
+        # Now there is an option to save any data.
+        if results[2] is True:
             user_input = input(save_results)
 
             if user_input == '1':
                 print('\nSaving...\n')
-                b = storage.store_labels_data(results[0], filename)
+                b = storage.store_data(last_detection, results[0], filename)
                 if b is True:
                     print('\nResults saved for ', filename, ' successfully.\n')
                 else:
@@ -162,7 +176,7 @@ while True:
                 sys.exit(0)
 
 
-        if faces == True and results[2] == True:
+        if detections['faces'] is True and results[2] is True:
             name, extention = os.path.splitext(results[1])
 
             user_input = input(faces_menu)
@@ -190,17 +204,21 @@ while True:
 
         if user_input == '1':
             user_input = input(provide_image)
-            storage.get_labels_data(user_input)
+            for i in detections:
+                storage.get_data(i, user_input)
 
         elif user_input == '2':
             user_input = input(provide_tag)
-            storage.get_images_by_tag(user_input)
+            storage.get_images_by_words(user_input)
+
 
         elif user_input == '3':
-            storage.get_num_of_documents('labels_data')
+            for i in detections:
+                storage.get_num_of_documents(i)
 
         elif user_input == '4':
-            storage.get_all_documents('labels_data')
+            for i in detections:
+                storage.get_all_documents(i)
 
         else:
             print('Error!\n')
@@ -210,7 +228,8 @@ while True:
 
     elif user_input == '3':
         user_input = input(provide_image)
-        storage.delete_labels_data(user_input)
+        for i in detections:
+            storage.delete_data(i, user_input)
 
 
     elif user_input == 'q':
@@ -222,8 +241,8 @@ while True:
         sys.exit(0)
 
 
-    labels = False
-    faces = False
+    for i in detections:
+        detections[i] = False
+    last_detection = ''
     command = ['tagging.py']
-
 
