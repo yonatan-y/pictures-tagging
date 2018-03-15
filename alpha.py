@@ -198,7 +198,6 @@ while True:
 
 
 
-
     elif user_input == '2':
         user_input = input(get_info_menu)
 
