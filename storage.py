@@ -147,16 +147,18 @@ def get_num_of_documents(index):
 
 #--------------------------------------------------------------------------------------------------#
 
-def get_all_documents(index):
+def get_all_documents(index, start=0, size=2):
     '''This function prints a list of all images in a specific index.'''
 
     if not es.indices.exists(index=index):
         print('\nThere is no', index, 'index.\n')
-        return
+        return None
+
+    image_ids = []
 
     query = { 'query' : { 'match_all' : {} } , 'stored_fields' : [] }
 
-    res = es.search(index=index, doc_type='doc', body=query, size=100)
+    res = es.search(index=index, doc_type='doc', body=query, from_=start, size=size)
 
     if int(res['hits']['total']) == 0:
         print('\nThere are no images in', index, 'index.\n')
@@ -165,6 +167,9 @@ def get_all_documents(index):
         print('\nAll images in', index, 'index:')
         for i in res['hits']['hits']:
             print(i['_id'])
+            image_ids.append(i['_id'])
+
+    return image_ids
 
 
 #--------------------------------------------------------------------------------------------------#
