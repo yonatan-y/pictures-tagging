@@ -42,6 +42,9 @@ def get_data(index, image_id):
     if not es.indices.exists(index=index):
         print('\nThere is no', index, 'index.\n')
         return False
+    
+    if image_id == '':
+        return False
 
     data = es.get(index=index, doc_type='doc', id=image_id, ignore=404)
     if data['found'] is False:
