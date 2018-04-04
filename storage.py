@@ -41,13 +41,15 @@ def get_data(index, image_id):
 
     if not es.indices.exists(index=index):
         print('\nThere is no', index, 'index.\n')
-        return
+        return False
 
     data = es.get(index=index, doc_type='doc', id=image_id, ignore=404)
     if data['found'] is False:
         print('\nThere is no data in', index, 'index for the given image.\n')
+        return False
     else:
         print(json.dumps((data), indent=4))
+        return json.dumps((data), indent=4)
 
 
 #--------------------------------------------------------------------------------------------------#
