@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import filedialog
 import beta_tag_window
 import beta_storage_window
 import beta_search_images
