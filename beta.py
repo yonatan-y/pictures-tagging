@@ -27,7 +27,6 @@ menu_bar = tk.Menu(root)
 options_menu = tk.Menu(menu_bar, tearoff=0, bg='white')
 options_menu.add_command(label='Tag', command=lambda: Tag(root))
 options_menu.add_command(label='Edit Storage', command=lambda: storage(root))
-#options_menu.add_command(label='Search')
 
 menu_bar.add_cascade(label='Options', menu=options_menu)
 
@@ -47,6 +46,7 @@ search_content_window = ''
 
 storage_window = ''
 
+# construct a new object of tag window.
 tag_window = beta_tag_window.TagWindow(root)
 
 root.config(menu=menu_bar)
