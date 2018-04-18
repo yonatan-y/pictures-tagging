@@ -177,7 +177,6 @@ class TagWindow:
 
         self.text_frame = tk.Frame(
             root,
-            #bg='white',
             width=self.width/3,
             height=self.height/6*5,
             highlightbackground='black',
@@ -235,7 +234,6 @@ class TagWindow:
             self.text_frame,
             text='Store results',
             state=tk.DISABLED
-            #command=lambda: self.save_results()
         )
         self.save_btn.config(command=lambda: self.save_results(self.save_btn))
 
