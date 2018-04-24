@@ -50,4 +50,5 @@ storage_window = ''
 tag_window = beta_tag_window.TagWindow(root)
 
 root.config(menu=menu_bar)
+root.title('Pictures tagging')
 root.mainloop()
