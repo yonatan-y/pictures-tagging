@@ -37,8 +37,8 @@ class TagWindow:
         if width > self.width/2-10:
             width = self.width/2-10
 
-        if height > self.height/4*3-40:
-            height = self.height/4*3-40
+        if height > self.height/6*5-40:
+            height = self.height/6*5-40
 
         im = im.resize((int(width), int(height)))
         photo = ImageTk.PhotoImage(im)
@@ -54,7 +54,7 @@ class TagWindow:
             bg='gray80',
             image=photo,
             width=self.width/2,
-            height=self.height/4*3-40
+            height=self.height/6*5-40
         )
         label.pack()
         label.photo = photo
@@ -165,22 +165,21 @@ class TagWindow:
             root,
             bg='gray80',
             width=self.width/2,
-            height=self.height/4*3,
+            height=self.height/6*5,
             highlightbackground='black',
             highlightthickness=0
         )
 
 
-        self.image_frame.place(x=10, y=self.height/12)
+        self.image_frame.place(x=10, y=15)
         self.image_frame.pack_propagate(False)
 
 
         self.text_frame = tk.Frame(
             root,
+            bg='white',
             width=self.width/3,
-            height=self.height/6*5,
-            highlightbackground='black',
-            highlightthickness=1
+            height=self.height/6*5
         )
 
         self.text_frame.place(x=2*self.width/3-30, y=15)
@@ -194,8 +193,12 @@ class TagWindow:
 
 
 
-        self.detections_frame = tk.LabelFrame(root, text='Select detection type')
-        self.detections_frame.place(x=self.width/2+20, y=self.height/4)
+        self.detections_frame = tk.LabelFrame(
+            root,
+            text='Select detection type',
+            font=('TkDefaultFont', 11)
+        )
+        self.detections_frame.place(x=self.width/2+28, y=self.height/4)
 
 
         self.detection_types = [
@@ -216,18 +219,27 @@ class TagWindow:
                 self.detections_frame,
                 text=text,
                 variable=self.variable,
-                value=mode
+                value=mode,
+                font=('TkDefaultFont', 10)
             ))
             self.rbs[mode-1].pack(anchor=tk.W)
             self.rbs[mode-1].bind(
                 '<Enter>',
-                lambda event, r=self.rbs[mode-1]: r.configure(font=('TkDefaultFont', 12, 'bold'))
+                lambda event, r=self.rbs[mode-1]: r.config(font=('TkDefaultFont', 10, 'bold'))
             )
             self.rbs[mode-1].bind(
                 '<Leave>',
-                lambda event, r=self.rbs[mode-1]: r.configure(font='TkDefaultFont')
+                lambda event, r=self.rbs[mode-1]: r.config(font=('TkDefaultFont', 10))
             )
 
+        # Update the frame to change its size and do not let
+        # its children affect its size.
+        self.detections_frame.update()
+        self.detections_frame.config(
+            width=int(self.detections_frame.winfo_width()),
+            height=int(self.detections_frame.winfo_height())+10
+        )
+        self.detections_frame.pack_propagate(False)
 
 
         self.save_btn = tk.Button(
@@ -243,6 +255,7 @@ class TagWindow:
             text='Process image',
             fg='green',
             state=tk.DISABLED,
+            font=('TkDefaultFont', 14, 'italic'),
             command=lambda: self.on_click_process_btn(self.results, self.variable, self.save_btn)
         )
 
@@ -255,14 +268,19 @@ class TagWindow:
         self.select_btn.pack(side='bottom', fill='x')
 
 
-        self.process_btn.place(x=self.width/2+15, y=self.height/2)
+        self.process_btn.place(x=self.width/2+28, y=self.height/2)
         self.process_btn.bind('<Enter>', lambda event: self.enter(self.process_btn))
         self.process_btn.bind('<Leave>', lambda event: self.leave(self.process_btn))
 
 
+        self.save_btn.pack(side='bottom', fill=tk.X)
 
-        self.scroll_y = tk.Scrollbar(self.text_frame, command=self.results.yview)
+        self.scroll_y = tk.Scrollbar(
+            self.text_frame,
+            command=self.results.yview
+        )
         self.scroll_y.pack(side='right', fill=tk.Y)
+
         self.scroll_x = tk.Scrollbar(self.text_frame, command=self.results.xview, orient=tk.HORIZONTAL)
         self.scroll_x.pack(side='bottom', fill=tk.X)
 
@@ -271,10 +289,11 @@ class TagWindow:
         self.results['xscrollcommand'] = self.scroll_x.set
 
 
-        self.save_btn.pack(side='bottom')
+        #self.save_btn.pack(side='bottom')
 
 
-        self.t='''results'''
+        self.t = '''results'''
 
         self.results.insert(tk.END, self.t)
         self.results.config(state=tk.DISABLED)
+        
