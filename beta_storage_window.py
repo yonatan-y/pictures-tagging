@@ -42,7 +42,7 @@ class StorageWindow:
 
 
     def __init__(self, root):
-
+        root.config(bg='gray70')
 
         self.frames = []
         self.names = []
@@ -59,33 +59,27 @@ class StorageWindow:
         for i in list(range(6)):
             self.frames.append(tk.Frame(
                 root,
-                highlightbackground='black',
-                highlightthickness=2,
-                width=self.width/8,
-                height=self.height/2
+                width=self.width/7,
+                height=self.height/3*2
             ))
-            self.frames[i].place(x=10+(self.width/8*i)+(10*i), y=20)
+            self.frames[i].place(x=self.width/49+(self.width/7*i)+(self.width/49*i), y=self.height/8)
             self.frames[i].pack_propagate(False) # Do not let its children control its size
 
             self.names.append(tk.Label(
                 self.frames[i],
-                text=names[i]
+                text=names[i],
+                font=('TkDefaultFont', 12, 'bold')
             ))
             self.names[i].pack()
 
 
             self.labelslists.append(tk.Listbox(
                 self.frames[i],
-                selectmode='multiple'
+                selectmode='multiple',
+                font=14
             ))
             self.labelslists[i].pack(expand=True, fill='both')
             self.labelslists[i].pack_propagate(False)
-            '''for item in ['one', 'two', 'three', 'four',
-                         'one', 'two', 'three', 'four',
-                         'one', 'two', 'three', 'four']:
-                self.labelslists[i].insert(tk.END, item)'''
-
-
 
 
             self.y_scrolls.append(tk.Scrollbar(
