@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import os
 from PIL import Image, ImageTk
 import tagging
@@ -13,7 +14,7 @@ class TagWindow:
 
     # Start def------------------------------------------------------------------------------
     def open_image(self, frame, btn):
-        '''This function is called when the user wants to open an image.
+        '''This method is called when the user wants to open an image.
            The image will be displayed on the screen after choosing.'''
 
         temp = self.selected_image
@@ -23,9 +24,8 @@ class TagWindow:
                        ('png files', '*.png')
                       ]
         )
-        #print(selected_image)
 
-        # If the user did not select any image
+        # If the user did not select any image.
         if self.selected_image == "":
             self.selected_image = temp
             return
@@ -49,6 +49,7 @@ class TagWindow:
             if i.winfo_class() == 'Label':
                 i.destroy()
 
+        # Create new label with the selected image.
         label = tk.Label(
             frame,
             bg='gray80',
@@ -59,12 +60,15 @@ class TagWindow:
         label.pack()
         label.photo = photo
 
+        # Enable 'Process image' button.
         btn.config(state=tk.NORMAL)
 
+        # Delete previous results.
         self.results.config(state=tk.NORMAL)
         self.results.delete('1.0', tk.END)
         self.results.config(state=tk.DISABLED)
 
+        # Disable 'Store results' button.
         self.save_btn.config(state=tk.DISABLED)
     # End def---------------------------------------------------------------------------------
 
@@ -72,7 +76,11 @@ class TagWindow:
 
     # Start def-------------------------------------------------------------------------------
     def on_click_process_btn(self, results, variable, btn):
+        '''This method is called when the user clicks on 'Process image' button.
+           It uses the module 'tagging' to process the image, and displays the
+           results on the screen.'''
 
+        # Get detection type for process.
         if variable.get() == 1:
             detect = 'labels'
         elif variable.get() == 2:
@@ -86,22 +94,29 @@ class TagWindow:
         elif variable.get() == 6:
             detect = 'text'
 
+        # Process image.
         res = tagging.make_request(['tagging.py', detect, 'content', self.selected_image])
 
+        # Display processing results.
         results.config(state=tk.NORMAL)
         results.delete('1.0', tk.END)
-        #results.insert(tk.END, self.selected_image)
+        results.insert(tk.END, 'Image id: '+os.path.split(res[1])[1]+'\n')
+        results.insert(
+            tk.END,
+            '------------------------------------------------------------------\n\n'
+        )
         results.insert(tk.END, res[0])
-        #results.insert(tk.END, detect)
         results.config(state=tk.DISABLED)
 
+        # If there was not a problem while processing and the results are
+        # good to be saved, update parameters and enable 'Store results' button.
         if res[2] is True:
             TagWindow.data_to_store['index'] = detect
             TagWindow.data_to_store['json_package'] = res[0]
             TagWindow.data_to_store['image_id'] = os.path.split(res[1])[1]
-            #print(TagWindow.data_to_store['index'])
-            #print(TagWindow.data_to_store['json_package'])
-            #print(TagWindow.data_to_store['image_id'])
+
+            messagebox.showinfo(os.path.split(res[1])[1]+', '+detect, res[0])
+
             btn.config(state=tk.NORMAL)
 
         else:
@@ -119,7 +134,7 @@ class TagWindow:
     # Start def-------------------------------------------------------------------------------
     def save_results(self, btn):
         '''This method is called when the user wants to save the results after
-           the image proccesing.'''
+           the image proccesing (clicks on 'Store results' button).'''
 
         # Store the results.
         storage.store_data(
@@ -139,24 +154,25 @@ class TagWindow:
 
 
     # Start def-------------------------------------------------------------------------------
-    def enter(self, p):
-        '''Change process button's color when mouse enter.'''
-        if p['state'] == 'normal':
-            p.config(bg='white')
+    def enter(self, btn):
+        '''Change button's color when mouse enter.'''
+        if btn['state'] == 'normal':
+            btn.config(bg='white')
     # End def---------------------------------------------------------------------------------
 
 
     # Start def-------------------------------------------------------------------------------
-    def leave(self, p):
-        '''Change process button's color when mouse leave.'''
-        if p['state'] == 'normal':
-            p.config(bg='gray94')
+    def leave(self, btn):
+        '''Change button's color when mouse leave.'''
+        if btn['state'] == 'normal':
+            btn.config(bg='gray94')
     # End def---------------------------------------------------------------------------------
 
 
 
-
+    # Start constructor-----------------------------------------------------------------------
     def __init__(self, root):
+
         self.selected_image = ''
         self.width, self.height = root.winfo_screenwidth(), root.winfo_screenheight()
 
@@ -165,12 +181,8 @@ class TagWindow:
             root,
             bg='gray80',
             width=self.width/2,
-            height=self.height/6*5,
-            highlightbackground='black',
-            highlightthickness=0
+            height=self.height/6*5
         )
-
-
         self.image_frame.place(x=10, y=15)
         self.image_frame.pack_propagate(False)
 
@@ -181,16 +193,15 @@ class TagWindow:
             width=self.width/3,
             height=self.height/6*5
         )
-
         self.text_frame.place(x=2*self.width/3-30, y=15)
         self.text_frame.pack_propagate(False)
+
 
         self.results = tk.Text(
             self.text_frame,
             wrap=tk.NONE,
             font=('Helvetica', 14)
         )
-
 
 
         self.detections_frame = tk.LabelFrame(
@@ -245,9 +256,12 @@ class TagWindow:
         self.save_btn = tk.Button(
             self.text_frame,
             text='Store results',
+            font=10,
             state=tk.DISABLED
         )
         self.save_btn.config(command=lambda: self.save_results(self.save_btn))
+        self.save_btn.bind('<Enter>', lambda event: self.enter(self.save_btn))
+        self.save_btn.bind('<Leave>', lambda event: self.leave(self.save_btn))
 
 
         self.process_btn = tk.Button(
@@ -262,10 +276,13 @@ class TagWindow:
         self.select_btn = tk.Button(
             self.image_frame,
             text='Select image',
+            font=10,
             command=lambda: self.open_image(self.image_frame, self.process_btn)
         )
 
         self.select_btn.pack(side='bottom', fill='x')
+        self.select_btn.bind('<Enter>', lambda event: self.enter(self.select_btn))
+        self.select_btn.bind('<Leave>', lambda event: self.leave(self.select_btn))
 
 
         self.process_btn.place(x=self.width/2+28, y=self.height/2)
@@ -281,7 +298,11 @@ class TagWindow:
         )
         self.scroll_y.pack(side='right', fill=tk.Y)
 
-        self.scroll_x = tk.Scrollbar(self.text_frame, command=self.results.xview, orient=tk.HORIZONTAL)
+        self.scroll_x = tk.Scrollbar(
+            self.text_frame,
+            command=self.results.xview,
+            orient=tk.HORIZONTAL
+        )
         self.scroll_x.pack(side='bottom', fill=tk.X)
 
         self.results.pack(expand=True, fill='both')
@@ -289,11 +310,6 @@ class TagWindow:
         self.results['xscrollcommand'] = self.scroll_x.set
 
 
-        #self.save_btn.pack(side='bottom')
-
-
-        self.t = '''results'''
-
-        self.results.insert(tk.END, self.t)
         self.results.config(state=tk.DISABLED)
+    # End constructor-------------------------------------------------------------------------
         
