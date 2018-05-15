@@ -29,9 +29,12 @@ class StorageWindow:
         selected_items.reverse()
         #print(type(selected_items))
         #print(selected_items)
+        length = len(selected_items)
+        if length == 0:
+            return
+
         for i in selected_items:
             storage.delete_data(name, labelslist.get(i))
-            #print(labelslist.get(i))
             labelslist.delete(i)
 
 
@@ -42,7 +45,7 @@ class StorageWindow:
 
 
     def __init__(self, root):
-        root.config(bg='gray70')
+        #root.config(bg='gray87')
 
         self.frames = []
         self.names = []
@@ -105,20 +108,45 @@ class StorageWindow:
             self.load_buttons.append(tk.Button(
                 self.frames[i],
                 text='Load more images',
+                font=('TkDefaultFont', 10),
+                pady=15,
+                bd=0
             ))
-            self.load_buttons[i].pack()
-            
+            self.load_buttons[i].pack(fill='x')
+            load_btn = self.load_buttons[i]
+            load_btn.bind(
+                '<Enter>',
+                lambda event, btn=load_btn: btn.config(font=('TkDefaultFont', 10, 'bold'))
+            )
+            load_btn.bind(
+                '<Leave>',
+                lambda event, btn=load_btn: btn.config(font=('TkDefaultFont', 10))
+            )
+
+
+
 
 
 
             self.delete_buttons.append(tk.Button(
                 self.frames[i],
                 text='Delete selected images',
-                fg='red'
+                fg='red',
+                font=('TkDefaultFont', 10),
+                bd=0
             ))
-            self.delete_buttons[i].pack(side='bottom')
-            
-            
+            self.delete_buttons[i].pack(side='bottom', fill='x')
+            dlt_btn = self.delete_buttons[i]
+            dlt_btn.bind(
+                '<Enter>',
+                lambda event, btn=dlt_btn: btn.config(font=('TkDefaultFont', 10, 'bold'))
+            )
+            dlt_btn.bind(
+                '<Leave>',
+                lambda event, btn=dlt_btn: btn.config(font=('TkDefaultFont', 10))
+            )
+
+
 
 
             if i == 0:
@@ -164,5 +192,4 @@ class StorageWindow:
                     command=lambda: self.delete_images(self.labelslists[5], 'text')
                 )
 
-        
 
