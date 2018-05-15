@@ -14,7 +14,6 @@ class StorageWindow:
         if res != None:
             for i in res:
                 labelslist.insert(tk.END, i)
-        #return
 
 
     # End def---------------------------------------------------------------------------------
@@ -35,7 +34,6 @@ class StorageWindow:
             return
 
         if messagebox.askyesno('', 'Are you sure you want to delete the selected items?') is True:
-            print('true')
             for i in selected_items:
                 storage.delete_data(name, labelslist.get(i))
                 #print(labelslist.get(i))
@@ -49,7 +47,6 @@ class StorageWindow:
 
 
     def __init__(self, root):
-        #root.config(bg='gray87')
 
         self.frames = []
         self.names = []
