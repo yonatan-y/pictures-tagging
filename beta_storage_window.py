@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 import storage
 
 
@@ -33,9 +34,12 @@ class StorageWindow:
         if length == 0:
             return
 
-        for i in selected_items:
-            storage.delete_data(name, labelslist.get(i))
-            labelslist.delete(i)
+        if messagebox.askyesno('', 'Are you sure you want to delete the selected items?') is True:
+            print('true')
+            for i in selected_items:
+                storage.delete_data(name, labelslist.get(i))
+                #print(labelslist.get(i))
+                labelslist.delete(i)
 
 
 
