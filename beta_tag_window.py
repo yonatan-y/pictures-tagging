@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 import os
+import json
 from PIL import Image, ImageTk
 import tagging
 import storage
@@ -70,6 +71,11 @@ class TagWindow:
 
         # Disable 'Store results' button.
         self.save_btn.config(state=tk.DISABLED)
+
+        path, filename = os.path.split(self.selected_image)
+        print('full name:', self.selected_image)
+        print('id: ', filename)
+        print('path: ', path)
     # End def---------------------------------------------------------------------------------
 
 
@@ -112,10 +118,17 @@ class TagWindow:
         # good to be saved, update parameters and enable 'Store results' button.
         if res[2] is True:
             TagWindow.data_to_store['index'] = detect
+
+            # Add Image path to json results.
+            res[0] = json.loads(res[0])
+            res[0]['Image path'] = os.path.split(res[1])[0]
+            res[0] = json.dumps(res[0], indent=4)
+
             TagWindow.data_to_store['json_package'] = res[0]
             TagWindow.data_to_store['image_id'] = os.path.split(res[1])[1]
 
             messagebox.showinfo(os.path.split(res[1])[1]+', '+detect, res[0])
+
 
             btn.config(state=tk.NORMAL)
 
