@@ -9,12 +9,18 @@ class StorageWindow:
 
     # Start def-------------------------------------------------------------------------------
     def load_images(self, labelslist, name):
+        '''This method is called when the user presses the button 'Load more items'.
+           The method gets more items from the index 'name' in the storage,
+           and displays the items in the screen.'''
+
+        # Get more items, start from position 'size'.
         size = labelslist.size()
         res = storage.get_all_documents(name, start=size)
+
+        # Display the items (if there are).
         if res != None:
             for i in res:
                 labelslist.insert(tk.END, i)
-
 
     # End def---------------------------------------------------------------------------------
 
@@ -24,11 +30,16 @@ class StorageWindow:
 
     # Start def------------------------------------------------------------------------------
     def delete_images(self, labelslist, name):
+        '''This method is called when the user presses the button 'Delete selected items'.
+           The method deletes the marked items from storage and then from the screen.'''
+
         selected_items = labelslist.curselection()
         selected_items = list(selected_items)
         selected_items.reverse()
         #print(type(selected_items))
         #print(selected_items)
+
+        # If no items were selected, do nothing.
         length = len(selected_items)
         if length == 0:
             return
@@ -40,12 +51,10 @@ class StorageWindow:
                 labelslist.delete(i)
 
 
-
-
     # End def---------------------------------------------------------------------------------
 
 
-
+    # Start constructor-----------------------------------------------------------------------
     def __init__(self, root):
 
         self.frames = []
@@ -104,11 +113,9 @@ class StorageWindow:
 
 
 
-
-
             self.load_buttons.append(tk.Button(
                 self.frames[i],
-                text='Load more images',
+                text='Load more items',
                 font=('TkDefaultFont', 10),
                 pady=15,
                 bd=0
@@ -127,12 +134,11 @@ class StorageWindow:
 
 
 
-
-
             self.delete_buttons.append(tk.Button(
                 self.frames[i],
-                text='Delete selected images',
+                text='Delete selected items',
                 fg='red',
+                activeforeground='red',
                 font=('TkDefaultFont', 10),
                 bd=0
             ))
@@ -192,5 +198,5 @@ class StorageWindow:
                 self.delete_buttons[5].config(
                     command=lambda: self.delete_images(self.labelslists[5], 'text')
                 )
-
+    # End constructor-------------------------------------------------------------------------
 
