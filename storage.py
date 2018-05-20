@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.ERROR)
 
 
 es = Elasticsearch() #Represents the elasticsearch client.
-
+#print(es.cluster.health())
 
 
 #--------------------------------------------------------------------------------------------------#
@@ -42,7 +42,7 @@ def get_data(index, image_id):
     if not es.indices.exists(index=index):
         print('\nThere is no', index, 'index.\n')
         return False
-    
+
     if image_id == '':
         return False
 
@@ -104,26 +104,29 @@ def delete_index(index):
 #--------------------------------------------------------------------------------------------------#
 
 
-def get_images_by_words(words):
+def get_images_by_words(words, start=0):
     '''This function gets words, and prints all images that contain
        data with the words, at least in one index.'''
-    
+
     query = {
         'query':{
             'bool':{
                 'should':[
-                    {'match' : { 'labelAnnotations.description' : words} },
-                    {'match' : { 'landmarkAnnotations.description' : words} },
-                    {'match' : { 'logoAnnotations.description' : words} },
-                    {'match' : { 'textAnnotations.description' : words} },
-                    {'match' : { 'webDetection.webEntities.description' : words} }
+                    {'match' : {'labelAnnotations.description' : words}},
+                    {'match' : {'landmarkAnnotations.description' : words}},
+                    {'match' : {'logoAnnotations.description' : words}},
+                    {'match' : {'textAnnotations.description' : words}},
+                    {'match' : {'webDetection.webEntities.description' : words}}
                     ]
                 }
-            },
-        'stored_fields' : []
+            }#,
+        #'stored_fields' : ['Image path']
         }
 
-    res = es.search(index='*', doc_type='doc', body=query, ignore=404)
+    files = []
+
+    res = es.search(index='*', doc_type='doc', body=query, _source=['Image path'], from_=start, size=1, ignore=404)
+    print(res)
 
     if int(res['hits']['total']) == 0:
         print('\nThere are no images with the word/s \'', words, '\'.')
@@ -132,6 +135,10 @@ def get_images_by_words(words):
         print('\nAll images with the word/s \'', words, '\' :')
         for i in res['hits']['hits']:
             print(i['_id'])
+            files.append(i['_source']['Image path']+'/'+i['_id'])
+
+    # Return path of all files, and number of total files that were found.
+    return [files, res['hits']['total']]
 
 
 
