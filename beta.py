@@ -13,6 +13,14 @@ def Tag(root_win):
             
     global tag_window
     tag_window = beta_tag_window.TagWindow(root)
+    
+def storage(root_win):
+    for i in root_win.winfo_children():
+        if i.winfo_class() != 'Menu':
+            i.destroy()
+
+    global storage_window
+    storage_window = beta_storage_window.StorageWindow(root_win)
 
 
 
