@@ -72,10 +72,6 @@ class TagWindow:
         # Disable 'Store results' button.
         self.save_btn.config(state=tk.DISABLED)
 
-        path, filename = os.path.split(self.selected_image)
-        print('full name:', self.selected_image)
-        print('id: ', filename)
-        print('path: ', path)
     # End def---------------------------------------------------------------------------------
 
 
@@ -126,8 +122,6 @@ class TagWindow:
 
             TagWindow.data_to_store['json_package'] = res[0]
             TagWindow.data_to_store['image_id'] = os.path.split(res[1])[1]
-
-            messagebox.showinfo(os.path.split(res[1])[1]+', '+detect, res[0])
 
 
             btn.config(state=tk.NORMAL)
