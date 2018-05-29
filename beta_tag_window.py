@@ -281,6 +281,7 @@ class TagWindow:
             root,
             text='Process image',
             fg='green',
+            bd=0,
             state=tk.DISABLED,
             font=('TkDefaultFont', 14, 'italic'),
             command=lambda: self.on_click_process_btn(self.results, self.variable, self.save_btn)
