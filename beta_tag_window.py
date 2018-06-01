@@ -6,6 +6,7 @@ import json
 from PIL import Image, ImageTk
 import tagging
 import storage
+import image_options
 
 
 class TagWindow:
@@ -31,35 +32,12 @@ class TagWindow:
             self.selected_image = temp
             return
 
-        # Open selected image and change its size if needed.
-        im = Image.open(self.selected_image)
-        width, height = im.size
+        # Open selected image.
+        img = Image.open(self.selected_image)
 
-        if width > self.width/2-10:
-            width = self.width/2-10
+        # Display selected image.
+        self.display_image(img)
 
-        if height > self.height/6*5-40:
-            height = self.height/6*5-40
-
-        im = im.resize((int(width), int(height)))
-        photo = ImageTk.PhotoImage(im)
-
-
-        # Delete previous label which has image.
-        for i in frame.winfo_children():
-            if i.winfo_class() == 'Label':
-                i.destroy()
-
-        # Create new label with the selected image.
-        label = tk.Label(
-            frame,
-            bg='gray80',
-            image=photo,
-            width=self.width/2,
-            height=self.height/6*5-40
-        )
-        label.pack()
-        label.photo = photo
 
         # Enable 'Process image' button.
         btn.config(state=tk.NORMAL)
@@ -72,6 +50,10 @@ class TagWindow:
         # Disable 'Store results' button.
         self.save_btn.config(state=tk.DISABLED)
 
+        path, filename = os.path.split(self.selected_image)
+        print('full name:', self.selected_image)
+        print('id: ', filename)
+        print('path: ', path)
     # End def---------------------------------------------------------------------------------
 
 
@@ -123,6 +105,8 @@ class TagWindow:
             TagWindow.data_to_store['json_package'] = res[0]
             TagWindow.data_to_store['image_id'] = os.path.split(res[1])[1]
 
+            #messagebox.showinfo(os.path.split(res[1])[1]+', '+detect, res[0])
+
 
             btn.config(state=tk.NORMAL)
 
@@ -132,6 +116,51 @@ class TagWindow:
                 TagWindow.data_to_store[i] = None
 
             btn.config(state=tk.DISABLED)
+
+        # If detection type was faces and faces were found,
+        # mark faces and display it.
+        if len(res) == 4:
+            img = image_options.draw(res[1], None, res[3])
+            self.display_image(img)
+
+
+    # End def---------------------------------------------------------------------------------
+
+
+
+
+    # Start def-------------------------------------------------------------------------------
+    def display_image(self, img):
+        '''This method gets an image and displays it on the screen.'''
+
+        # Change size of image if needed.
+        width, height = img.size
+
+        if width > self.width/2-10:
+            width = self.width/2-10
+
+        if height > self.height/6*5-40:
+            height = self.height/6*5-40
+
+        img = img.resize((int(width), int(height)))
+        photo = ImageTk.PhotoImage(img)
+
+
+        # Delete previous label which has image.
+        for i in self.image_frame.winfo_children():
+            if i.winfo_class() == 'Label':
+                i.destroy()
+
+        # Create new label with the selected image.
+        label = tk.Label(
+            self.image_frame,
+            bg='gray80',
+            image=photo,
+            width=self.width/2,
+            height=self.height/6*5-40
+        )
+        label.pack()
+        label.photo = photo
 
     # End def---------------------------------------------------------------------------------
 
