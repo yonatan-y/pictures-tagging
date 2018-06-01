@@ -9,14 +9,20 @@ def draw(input_image, output_image, faces):
     '''This function draws squares around face/s in a given image,
        and saves a new image that contains the drawing/s.'''
 
-    im = Image.open(input_image)
-    d = ImageDraw.Draw(im)
+    img = Image.open(input_image)
+    d = ImageDraw.Draw(img)
 
     for i in  range(len(faces)):
         face = faces[i]
         d.line([face[0], face[1], face[2], face[3], face[0]], 'grey', 5)
 
-    im.save(output_image, 'JPEG')
+    if output_image is not None:
+        try:
+            img.save(output_image, 'JPEG')
+        except IOError:
+            print('Image was not saved\n')
+
+    return img
 
 
 
