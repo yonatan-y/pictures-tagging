@@ -148,9 +148,9 @@ def get_num_of_documents(index):
     '''This function prints the munber of images in a specific index.'''
 
     if not es.indices.exists(index=index):
-        print('\nThere is no', index,'index.\n')
+        print('\nThere is no', index, 'index.\n')
         return
-   
+
     num = es.count(index=index, doc_type='doc')
     num = num['count']
 
@@ -168,7 +168,7 @@ def get_all_documents(index, start=0, size=2):
 
     image_ids = []
 
-    query = { 'query' : { 'match_all' : {} } , 'stored_fields' : [] }
+    query = {'query':{'match_all':{}}, 'stored_fields':[]}
 
     res = es.search(index=index, doc_type='doc', body=query, from_=start, size=size)
 
@@ -197,7 +197,7 @@ def check_connection():
 def get_images_by_score(score):
     '''This function gets a score, and prints all images that contains at least
         one description with same score or higher score.'''
-    
+
     if not isinstance(score, (float, int)):
         print('Error! input must be float.\n')
         return
