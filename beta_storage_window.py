@@ -5,6 +5,9 @@ import storage
 
 
 class StorageWindow:
+    '''This class represents an object that creates a page for accessing to the
+       storage and editing it.
+       The object constructs all widgets ant implements functionality.'''
 
 
     # Start def-------------------------------------------------------------------------------
@@ -27,7 +30,6 @@ class StorageWindow:
 
 
 
-
     # Start def------------------------------------------------------------------------------
     def delete_images(self, labelslist, name):
         '''This method is called when the user presses the button 'Delete selected items'.
@@ -36,8 +38,6 @@ class StorageWindow:
         selected_items = labelslist.curselection()
         selected_items = list(selected_items)
         selected_items.reverse()
-        #print(type(selected_items))
-        #print(selected_items)
 
         # If no items were selected, do nothing.
         length = len(selected_items)
@@ -47,9 +47,7 @@ class StorageWindow:
         if messagebox.askyesno('', 'Are you sure you want to delete the selected items?') is True:
             for i in selected_items:
                 storage.delete_data(name, labelslist.get(i))
-                #print(labelslist.get(i))
                 labelslist.delete(i)
-
 
     # End def---------------------------------------------------------------------------------
 
