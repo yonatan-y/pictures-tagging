@@ -10,12 +10,15 @@ import image_options
 
 
 class TagWindow:
+    '''This class represents an object that creates a page for tagging
+       and storing images.
+       The object constructs all widgets ant implements functionality.'''
 
     # This dictionary represents the needed parameters to store data.
     data_to_store = {'index':None, 'json_package':None, 'image_id':None}
 
     # Start def------------------------------------------------------------------------------
-    def open_image(self, frame, btn):
+    def open_image(self, btn):
         '''This method is called when the user wants to open an image.
            The image will be displayed on the screen after choosing.'''
 
@@ -183,7 +186,7 @@ class TagWindow:
         for i in list(TagWindow.data_to_store.keys()):
             TagWindow.data_to_store[i] = None
 
-        btn.config(state=tk.DISABLED)
+        btn.config(bg='gray94', state=tk.DISABLED)
         return
 
     # End def---------------------------------------------------------------------------------
@@ -314,7 +317,7 @@ class TagWindow:
             self.image_frame,
             text='Select image',
             font=10,
-            command=lambda: self.open_image(self.image_frame, self.process_btn)
+            command=lambda: self.open_image(self.process_btn)
         )
 
         self.select_btn.pack(side='bottom', fill='x')
