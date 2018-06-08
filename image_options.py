@@ -38,8 +38,11 @@ def crop(input_image, output_image, faces):
     for i in  range(len(faces)):
         face = faces[i]
         im2 = im.crop([face[0][0], face[0][1], face[2][0], face[2][1]])
-        im2.save(output_image[:len(output_image)-4]+
-                 str(i)+output_image[len(output_image)-5:len(output_image)], 'JPEG')
+        try:
+            im2.save(output_image[:len(output_image)-4]+
+                     str(i)+output_image[len(output_image)-5:len(output_image)], 'JPEG')
+        except IOError:
+            print('Image', i+1, 'was not saved')
 
 
 #--------------------------------------------------------------------------------------------------#
