@@ -2,6 +2,9 @@ import tkinter as tk
 import storage
 
 class SearchContentWindow:
+    '''This class represents an object that creates a page for searching
+       images metadata in storage.
+       The object constructs all widgets ant implements functionality.'''
 
     results_frames = {'name':[], 'found':[], 'button':[]}
     results_data = []
