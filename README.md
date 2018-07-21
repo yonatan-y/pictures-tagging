@@ -8,5 +8,5 @@
  * Clone this repository.  
  * Download and install Python (version 3.6.3 or newer).  
  * Download and install Elasticsearch (version 6.0.0 or newer).  
- * Puchase an API key from ![Google Cloud Vision] (https://cloud.google.com/vision/)  
+ * Puchase an API key from ![Google Cloud Vision](https://cloud.google.com/vision/)  
  * Put 
