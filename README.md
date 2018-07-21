@@ -8,5 +8,7 @@
  * Clone this repository.  
  * Download and install Python (version 3.6.3 or newer).  
  * Download and install Elasticsearch (version 6.0.0 or newer).  
- * Puchase an API key from ![Google Cloud Vision](https://cloud.google.com/vision/)  
- * Put 
+ * Puchase an API key from [Google Cloud Vision](https://cloud.google.com/vision/).  
+ * Copy the key and paste it inside the file api_key.txt.  
+ * Run elasticsearch.  
+ * Run the file beta_gui.py.  
