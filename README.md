@@ -20,4 +20,4 @@
  ## Extensive explanation  
  [Final report](https://github.com/yonatan-y/pictures-tagging/blob/master/docs/final%20report.pdf)  
    
- For all other details check out the [wiki](https://github.com/yonatan-y/pictures-tagging/wiki)
+ For all other details check out the [wiki](https://github.com/yonatan-y/pictures-tagging/wiki).
