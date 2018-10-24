@@ -15,4 +15,9 @@
  
  
  ## Example usage + short description  
- [Poster]()
+ [Poster](https://github.com/yonatan-y/pictures-tagging/blob/master/docs/poster.pdf)  
+ 
+ ## Extensive explanation  
+ [Final report](https://github.com/yonatan-y/pictures-tagging/blob/master/docs/final%20report.pdf)  
+   
+ For all other details check out the [wiki](https://github.com/yonatan-y/pictures-tagging/wiki)
